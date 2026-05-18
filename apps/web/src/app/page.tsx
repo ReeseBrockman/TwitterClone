@@ -13,18 +13,17 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-8 px-6 py-16">
+    <div className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-8 px-6 py-16 text-center">
       <div>
         <h1 className="text-4xl font-bold tracking-tight text-chirp-text">
           Chirp
         </h1>
         <p className="mt-3 text-lg text-chirp-muted">
-          A calm timeline: posts from people you follow, newest first. A
-          separate &quot;Today&quot; board ranks UTC-day posts by public
-          interactions — never mixed into your Following feed.
+          Social, without the noise.
         </p>
+        <p className="mt-2 text-base text-chirp-muted">Coming soon.</p>
       </div>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-row flex-nowrap justify-center gap-3">
         <Link
           href="/login"
           className="rounded-full bg-chirp-accent px-5 py-2.5 text-sm font-semibold text-black hover:brightness-110"
