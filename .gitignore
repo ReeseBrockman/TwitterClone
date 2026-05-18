@@ -1,0 +1,9 @@
+node_modules
+.next
+dist
+.turbo
+.expo
+*.log
+.DS_Store
+apps/web/.env.local
+apps/mobile/.env

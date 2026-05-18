@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root {
+  --chirp-bg: #0a0a0a;
+  --chirp-surface: #141414;
+  --chirp-border: #2a2a2a;
+  --chirp-muted: #a3a3a3;
+  --chirp-text: #fafafa;
+  --chirp-accent: #00e676;
+}
+
+@theme inline {
+  --color-chirp-bg: var(--chirp-bg);
+  --color-chirp-surface: var(--chirp-surface);
+  --color-chirp-border: var(--chirp-border);
+  --color-chirp-muted: var(--chirp-muted);
+  --color-chirp-text: var(--chirp-text);
+  --color-chirp-accent: var(--chirp-accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--chirp-bg);
+  color: var(--chirp-text);
+}
