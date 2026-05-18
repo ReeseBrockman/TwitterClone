@@ -1,168 +1,86 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { BIO_MAX, DISPLAY_NAME_MAX, isValidHandle } from "@chirp/shared";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Avatar } from "@/components/avatar";
 import { PageHeader } from "@/components/page-header";
-import { createClient } from "@/lib/supabase/client";
+import { SetupRequired } from "@/components/setup-required";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { createClient } from "@/lib/supabase/server";
 
-export default function SettingsPage() {
-  const [handle, setHandle] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [bio, setBio] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user || cancelled) {
-        setLoading(false);
-        return;
-      }
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("handle, display_name, bio")
-        .eq("id", user.id)
-        .maybeSingle();
-      if (!cancelled && profile) {
-        setHandle(profile.handle);
-        setDisplayName(profile.display_name ?? "");
-        setBio(profile.bio ?? "");
-      }
-      if (!cancelled) setLoading(false);
-    }
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  async function save(e: React.FormEvent) {
-    e.preventDefault();
-    setMessage(null);
-    setError(null);
-    const nextHandle = handle.trim().toLowerCase();
-    if (!isValidHandle(nextHandle)) {
-      setError(
-        "Username must be 2–30 characters: letters, numbers, and underscores only.",
-      );
-      return;
-    }
-    const name = displayName.trim();
-    if (name.length > DISPLAY_NAME_MAX) {
-      setError(`Display name must be ${DISPLAY_NAME_MAX} characters or less.`);
-      return;
-    }
-    const bioText = bio.trim();
-    if (bioText.length > BIO_MAX) {
-      setError(`Bio must be ${BIO_MAX} characters or less.`);
-      return;
-    }
-    setSaving(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      setError("Not signed in.");
-      setSaving(false);
-      return;
-    }
-    const { error: upErr } = await supabase
-      .from("profiles")
-      .update({
-        handle: nextHandle,
-        display_name: name,
-        bio: bioText,
-      })
-      .eq("id", user.id);
-    setSaving(false);
-    if (upErr) {
-      if (
-        upErr.code === "23505" ||
-        upErr.message?.toLowerCase().includes("duplicate")
-      ) {
-        setError("That username is already taken. Try another.");
-      } else {
-        setError(upErr.message);
-      }
-      return;
-    }
-    setHandle(nextHandle);
-    setMessage("Saved. Your profile URL is now /u/" + nextHandle);
-  }
-
-  if (loading) {
-    return (
-      <div className="border-b border-chirp-border px-4 py-8 text-chirp-muted">
-        Loading…
+function SettingsRow({
+  href,
+  title,
+  description,
+}: {
+  href: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-between gap-4 border-b border-chirp-border px-5 py-4 transition-colors hover:bg-white/[0.02] last:border-b-0"
+    >
+      <div className="min-w-0 text-left">
+        <p className="font-medium text-chirp-text">{title}</p>
+        <p className="mt-0.5 text-sm text-chirp-muted">{description}</p>
       </div>
-    );
-  }
+      <span className="shrink-0 text-chirp-muted" aria-hidden>
+        →
+      </span>
+    </Link>
+  );
+}
+
+export default async function ProfilePage() {
+  if (!isSupabaseConfigured()) return <SetupRequired />;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("handle, display_name, bio")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile) redirect("/login");
+
+  const name = profile.display_name?.trim() || profile.handle;
 
   return (
     <>
-      <PageHeader
-        title="Profile"
-        description="Username, display name, and bio"
-      />
-      <form className="max-w-md space-y-4 px-5 py-6" onSubmit={(e) => void save(e)}>
-        <label className="block text-sm font-medium text-chirp-muted">
-          Username (handle)
-          <input
-            value={handle}
-            onChange={(e) => setHandle(e.target.value)}
-            autoComplete="username"
-            className="mt-1 w-full rounded-xl border border-chirp-border bg-chirp-bg px-3 py-2 font-mono text-chirp-text outline-none ring-chirp-accent focus:ring-2"
-            placeholder="your_handle"
-          />
-        </label>
-        <label className="block text-sm font-medium text-chirp-muted">
-          Display name
-          <input
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            maxLength={DISPLAY_NAME_MAX}
-            className="mt-1 w-full rounded-xl border border-chirp-border bg-chirp-bg px-3 py-2 text-chirp-text outline-none ring-chirp-accent focus:ring-2"
-            placeholder="Name shown on posts"
-          />
-        </label>
-        <label className="block text-sm font-medium text-chirp-muted">
-          Bio
-          <textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            maxLength={BIO_MAX}
-            rows={4}
-            className="mt-1 w-full resize-none rounded-xl border border-chirp-border bg-chirp-bg px-3 py-2 text-chirp-text outline-none ring-chirp-accent focus:ring-2"
-            placeholder="Short bio"
-          />
-        </label>
-        <p className="text-xs text-chirp-muted">{BIO_MAX - bio.length} left</p>
-        {error ? (
-          <p className="text-sm text-red-400" role="alert">
-            {error}
-          </p>
-        ) : null}
-        {message ? (
-          <p className="text-sm text-chirp-accent" role="status">
-            {message}
-          </p>
-        ) : null}
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-full bg-chirp-accent px-5 py-2 text-sm font-semibold text-black hover:brightness-110 disabled:opacity-50"
-        >
-          {saving ? "Saving…" : "Save changes"}
-        </button>
-      </form>
+      <PageHeader title="Profile" description="Your account and public profile" />
+      <div className="flex items-start gap-4 border-b border-chirp-border px-5 py-6">
+        <Avatar displayName={name} handle={profile.handle} />
+        <div className="min-w-0">
+          <p className="text-lg font-semibold text-chirp-text">{name}</p>
+          <p className="text-chirp-accent">@{profile.handle}</p>
+          {profile.bio?.trim() ? (
+            <p className="mt-2 text-sm leading-relaxed text-chirp-muted">
+              {profile.bio}
+            </p>
+          ) : (
+            <p className="mt-2 text-sm text-chirp-muted">No bio yet.</p>
+          )}
+          {user.email ? (
+            <p className="mt-3 text-xs text-chirp-muted">{user.email}</p>
+          ) : null}
+        </div>
+      </div>
+      <nav aria-label="Profile settings">
+        <SettingsRow
+          href="/settings/account"
+          title="Account settings"
+          description="Username, display name, and bio"
+        />
+        <SettingsRow
+          href={`/u/${profile.handle}`}
+          title="View public profile"
+          description="See how others see you"
+        />
+      </nav>
     </>
   );
 }

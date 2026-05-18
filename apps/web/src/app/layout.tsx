@@ -12,9 +12,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
-  title: "Chirp",
-  description: "Chronological microblogging — Following feed + Today (UTC)",
+  metadataBase: new URL(siteUrl),
+  title: "chirp.",
+  description: "Natural social, pre algorithm.",
+  openGraph: {
+    title: "chirp.",
+    description: "Natural social, pre algorithm.",
+    siteName: "chirp.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "chirp.",
+    description: "Natural social, pre algorithm.",
+  },
 };
 
 export default function RootLayout({

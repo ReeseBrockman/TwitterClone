@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navItems = [
-  { href: "/following", label: "Home", icon: HomeIcon },
-  { href: "/search", label: "Search", icon: SearchIcon },
-  { href: "/today", label: "Today", icon: TodayIcon },
-  { href: "/settings", label: "Profile", icon: ProfileIcon },
-] as const;
+function navItems(profileHref: string) {
+  return [
+    { href: "/following", label: "Home", icon: HomeIcon },
+    { href: "/search", label: "Search", icon: SearchIcon },
+    { href: "/today", label: "Today", icon: TodayIcon },
+    { href: profileHref, label: "Profile", icon: ProfileIcon },
+  ] as const;
+}
 
 function NavLink({
   href,
@@ -45,8 +47,9 @@ function NavLink({
   );
 }
 
-export function AppNav() {
+export function AppNav({ profileHref }: { profileHref: string }) {
   const pathname = usePathname() ?? "/";
+  const items = navItems(profileHref);
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
@@ -62,9 +65,9 @@ export function AppNav() {
         </Link>
 
         <nav className="flex flex-1 flex-col gap-1">
-          {navItems.map((item) => (
+          {items.map((item) => (
             <NavLink
-              key={item.href}
+              key={item.label}
               {...item}
               active={isActive(item.href)}
             />
@@ -90,9 +93,9 @@ export function AppNav() {
 
       {/* Mobile bottom bar */}
       <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-chirp-border bg-chirp-surface/95 px-2 py-2 backdrop-blur-xl md:hidden">
-        {navItems.map((item) => (
+        {items.map((item) => (
           <NavLink
-            key={item.href}
+            key={item.label}
             {...item}
             active={isActive(item.href)}
             compact

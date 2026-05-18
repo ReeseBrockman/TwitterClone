@@ -10,11 +10,16 @@ function initials(displayName: string, handle: string) {
 type Props = {
   displayName: string;
   handle: string;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
 };
 
 export function Avatar({ displayName, handle, size = "md" }: Props) {
-  const dim = size === "sm" ? "h-9 w-9 text-xs" : "h-11 w-11 text-sm";
+  const dim =
+    size === "sm"
+      ? "h-9 w-9 text-xs"
+      : size === "lg"
+        ? "h-20 w-20 text-xl md:h-[88px] md:w-[88px] md:text-2xl"
+        : "h-11 w-11 text-sm";
   return (
     <div
       className={`${dim} flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-chirp-accent/30 to-chirp-surface font-semibold text-chirp-accent ring-2 ring-chirp-accent/40`}

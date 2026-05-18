@@ -45,7 +45,7 @@ export async function updateSession(request: NextRequest) {
     path === "/today" ||
     path === "/search" ||
     path === "/compose" ||
-    path === "/settings" ||
+    path.startsWith("/settings") ||
     path.startsWith("/u/");
 
   if (!user && isProtected) {

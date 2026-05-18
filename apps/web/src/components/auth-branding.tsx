@@ -1,3 +1,5 @@
+import { ChirpLogo } from "@/components/chirp-logo";
+
 export function AuthBranding({ size = "lg" }: { size?: "lg" | "sm" }) {
   const titleClass =
     size === "lg"
@@ -10,9 +12,11 @@ export function AuthBranding({ size = "lg" }: { size?: "lg" | "sm" }) {
 
   return (
     <div className="text-center">
-      <h1 className={titleClass}>chirp.</h1>
+      <h1 className={titleClass}>
+        <ChirpLogo />
+      </h1>
       <p className={taglineClass}>Natural social, pre algorithm.</p>
-      <p className={soonClass}>Coming soon.</p>
+      <p className={soonClass}>In Development*</p>
     </div>
   );
 }

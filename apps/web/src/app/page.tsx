@@ -25,7 +25,7 @@ export default async function HomePage() {
         </Link>
         <Link
           href="/register"
-          className="rounded-full border border-chirp-border px-5 py-2.5 text-sm font-semibold text-chirp-text hover:border-chirp-accent hover:text-chirp-accent"
+          className="rounded-full border border-chirp-accent px-5 py-2.5 text-sm font-semibold text-chirp-accent hover:bg-chirp-accent/10"
         >
           Create account
         </Link>
