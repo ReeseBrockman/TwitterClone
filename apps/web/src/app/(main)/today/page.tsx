@@ -1,3 +1,5 @@
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import { SetupRequired } from "@/components/setup-required";
 import { PostCard, type PostRow } from "@/components/post-card";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -39,13 +41,18 @@ export default async function TodayPage() {
 
   if (postIds.length === 0) {
     return (
-      <div className="px-4 py-10 text-center text-chirp-muted">
-        <h1 className="text-xl font-bold text-chirp-text">Today (UTC)</h1>
-        <p className="mt-2 text-sm">
-          No root posts yet for the UTC calendar day. Score = likes + replies
-          (no reposts).
-        </p>
-      </div>
+      <>
+        <PageHeader
+          title="Today"
+          description="Top posts from the UTC day · likes + replies"
+          badge="UTC"
+        />
+        <EmptyState
+          title="Quiet day"
+          description="No posts yet for today's board. Be the first to post."
+          action={{ href: "/compose", label: "Write a post" }}
+        />
+      </>
     );
   }
 
@@ -97,18 +104,16 @@ export default async function TodayPage() {
   }));
 
   return (
-    <div>
-      <div className="border-b border-chirp-border px-4 py-3">
-        <h1 className="text-xl font-bold text-chirp-text">Today (UTC)</h1>
-        <p className="text-sm text-chirp-muted">
-          Global posts from the current UTC day, ranked by likes + replies (no
-          reposts). Separate from your Following timeline.
-        </p>
-      </div>
+    <>
+      <PageHeader
+        title="Today"
+        description="Top posts from the UTC day · separate from your home feed"
+        badge="UTC"
+      />
       {cards.map(({ post, score }) => (
         <div key={post.id}>
-          <div className="flex items-center justify-end px-4 pt-3">
-            <span className="rounded-full bg-chirp-surface px-2 py-0.5 text-xs font-medium text-chirp-accent ring-1 ring-chirp-border">
+          <div className="flex items-center justify-end px-5 pt-3">
+            <span className="rounded-full border border-chirp-accent/40 bg-chirp-accent/10 px-2.5 py-0.5 text-xs font-medium text-chirp-accent">
               score {score.toFixed(0)}
             </span>
           </div>
@@ -119,6 +124,6 @@ export default async function TodayPage() {
           />
         </div>
       ))}
-    </div>
+    </>
   );
 }

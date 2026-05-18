@@ -24,3 +24,9 @@ body {
   background: var(--chirp-bg);
   color: var(--chirp-text);
 }
+
+.app-shell {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(0 230 118 / 0.12), transparent),
+    var(--chirp-bg);
+}

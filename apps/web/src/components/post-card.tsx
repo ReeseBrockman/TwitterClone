@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Avatar } from "@/components/avatar";
 import { LikeButton } from "@/components/like-button";
 import { publicMediaUrl } from "@/lib/media-url";
 
@@ -28,6 +29,16 @@ type Props = {
   likedByMe: boolean;
 };
 
+function timeAgo(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "now";
+  if (mins < 60) return `${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h`;
+  return `${Math.floor(hrs / 24)}d`;
+}
+
 export function PostCard({ post, likeCount, likedByMe }: Props) {
   const profile = post.profiles;
   const handle = profile?.handle ?? "unknown";
@@ -35,23 +46,28 @@ export function PostCard({ post, likeCount, likedByMe }: Props) {
   const media = post.post_media?.[0];
 
   return (
-    <article className="border-b border-chirp-border px-4 py-4">
+    <article className="border-b border-chirp-border px-5 py-4 transition-colors hover:bg-white/[0.02]">
       <div className="flex gap-3">
-        <div className="mt-1 h-10 w-10 shrink-0 rounded-full bg-chirp-surface ring-1 ring-chirp-border" />
+        <Link href={`/u/${handle}`} className="shrink-0">
+          <Avatar displayName={name} handle={handle} />
+        </Link>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            <span className="truncate font-semibold text-chirp-text">{name}</span>
+            <Link
+              href={`/u/${handle}`}
+              className="truncate font-semibold text-chirp-text hover:text-chirp-accent"
+            >
+              {name}
+            </Link>
             <Link
               href={`/u/${handle}`}
               className="truncate text-sm text-chirp-muted hover:text-chirp-accent"
             >
               @{handle}
             </Link>
-            <span className="text-xs text-chirp-muted">
-              {new Date(post.created_at).toLocaleString()}
-            </span>
+            <span className="text-xs text-chirp-muted">· {timeAgo(post.created_at)}</span>
           </div>
-          <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-chirp-text">
+          <p className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-chirp-text">
             {post.content}
           </p>
           {media?.kind === "image" ? (

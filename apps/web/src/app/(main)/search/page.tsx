@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { PageHeader } from "@/components/page-header";
 import { createClient } from "@/lib/supabase/client";
 
 function sanitize(q: string) {
@@ -51,11 +52,9 @@ export default function SearchPage() {
   }, [debounced]);
 
   return (
-    <div className="border-b border-chirp-border px-4 py-4">
-      <h1 className="text-xl font-bold text-chirp-text">Search</h1>
-      <p className="text-sm text-chirp-muted">
-        Find people by @handle (partial match).
-      </p>
+    <>
+      <PageHeader title="Search" description="Find people by @handle" />
+      <div className="px-5 py-4">
       <input
         type="search"
         value={q}
@@ -94,6 +93,7 @@ export default function SearchPage() {
           Type at least one character to search.
         </p>
       ) : null}
-    </div>
+      </div>
+    </>
   );
 }

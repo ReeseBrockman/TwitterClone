@@ -1,3 +1,5 @@
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import { SetupRequired } from "@/components/setup-required";
 import { PostCard, type PostRow } from "@/components/post-card";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -19,14 +21,17 @@ export default async function FollowingPage() {
   const followingIds = (follows ?? []).map((f) => f.following_id);
   if (followingIds.length === 0) {
     return (
-      <div className="px-4 py-10 text-center text-chirp-muted">
-        <p className="text-lg text-chirp-text">Your Following feed is empty</p>
-        <p className="mt-2 text-sm">
-          Open someone&apos;s profile with{" "}
-          <span className="font-mono text-chirp-accent">/u/handle</span> and
-          follow them. Posts appear here in chronological order — no ranking.
-        </p>
-      </div>
+      <>
+        <PageHeader
+          title="Home"
+          description="Chronological posts from people you follow"
+        />
+        <EmptyState
+          title="Nothing here yet"
+          description="Search for people, follow them, and their posts show up here — newest first."
+          action={{ href: "/search", label: "Find people" }}
+        />
+      </>
     );
   }
 
@@ -84,17 +89,17 @@ export default async function FollowingPage() {
   }));
 
   return (
-    <div>
-      <div className="border-b border-chirp-border px-4 py-3">
-        <h1 className="text-xl font-bold text-chirp-text">Following</h1>
-        <p className="text-sm text-chirp-muted">
-          Newest first · only accounts you follow
-        </p>
-      </div>
+    <>
+      <PageHeader
+        title="Home"
+        description="Chronological posts from people you follow"
+      />
       {rows.length === 0 ? (
-        <p className="px-4 py-8 text-center text-chirp-muted">
-          No posts yet from people you follow.
-        </p>
+        <EmptyState
+          title="No posts yet"
+          description="People you follow haven't posted. Check back later or write something."
+          action={{ href: "/compose", label: "Write a post" }}
+        />
       ) : (
         rows.map((post) => (
           <PostCard
@@ -105,6 +110,6 @@ export default async function FollowingPage() {
           />
         ))
       )}
-    </div>
+    </>
   );
 }

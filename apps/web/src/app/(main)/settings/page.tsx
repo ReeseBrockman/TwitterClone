@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isValidHandle, DISPLAY_NAME_MAX, BIO_MAX } from "@chirp/shared";
+import { BIO_MAX, DISPLAY_NAME_MAX, isValidHandle } from "@chirp/shared";
+import { PageHeader } from "@/components/page-header";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SettingsPage() {
@@ -106,13 +107,12 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="border-b border-chirp-border px-4 py-6">
-      <h1 className="text-xl font-bold text-chirp-text">Profile & account</h1>
-      <p className="mt-1 text-sm text-chirp-muted">
-        Change your username (@handle), display name, and bio. Usernames must stay
-        unique across the app.
-      </p>
-      <form className="mt-6 max-w-md space-y-4" onSubmit={(e) => void save(e)}>
+    <>
+      <PageHeader
+        title="Profile"
+        description="Username, display name, and bio"
+      />
+      <form className="max-w-md space-y-4 px-5 py-6" onSubmit={(e) => void save(e)}>
         <label className="block text-sm font-medium text-chirp-muted">
           Username (handle)
           <input
@@ -163,6 +163,6 @@ export default function SettingsPage() {
           {saving ? "Saving…" : "Save changes"}
         </button>
       </form>
-    </div>
+    </>
   );
 }

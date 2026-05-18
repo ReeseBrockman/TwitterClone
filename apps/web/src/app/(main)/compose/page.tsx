@@ -4,6 +4,7 @@ import {
   POST_MAX_LENGTH,
   POST_MAX_VIDEO_SECONDS,
 } from "@chirp/shared";
+import { PageHeader } from "@/components/page-header";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -143,13 +144,12 @@ export default function ComposePage() {
   }
 
   return (
-    <div className="border-b border-chirp-border px-4 py-4">
-      <h1 className="text-xl font-bold text-chirp-text">New post</h1>
-      <p className="text-sm text-chirp-muted">
-        Up to {POST_MAX_LENGTH} characters · max 1 image or 1 video (
-        {POST_MAX_VIDEO_SECONDS}s)
-      </p>
-      <form className="mt-4 space-y-4" onSubmit={(e) => void publish(e)}>
+    <>
+      <PageHeader
+        title="New post"
+        description={`Up to ${POST_MAX_LENGTH} chars · 1 image or 1 video (${POST_MAX_VIDEO_SECONDS}s max)`}
+      />
+      <form className="space-y-4 px-5 py-4" onSubmit={(e) => void publish(e)}>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -190,6 +190,6 @@ export default function ComposePage() {
           {busy ? "Posting…" : "Post"}
         </button>
       </form>
-    </div>
+    </>
   );
 }
