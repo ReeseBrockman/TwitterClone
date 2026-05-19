@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AtHandle } from "@/components/at-handle";
 import { Avatar } from "@/components/avatar";
 import { avatarPublicUrl } from "@/lib/avatar-url";
 import { FollowButton } from "@/components/follow-button";
@@ -53,8 +54,11 @@ export function ProfileHeader({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 md:gap-3">
-            <h1 className="truncate text-sm font-semibold text-chirp-text md:text-base">
-              {handle}
+            <h1 className="min-w-0 truncate">
+              <AtHandle
+                handle={handle}
+                className="text-sm font-semibold md:text-base"
+              />
             </h1>
             <div className="flex flex-1 flex-wrap items-center justify-end gap-2 min-[420px]:justify-start">
               {isSelf ? (

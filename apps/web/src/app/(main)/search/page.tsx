@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AtHandle } from "@/components/at-handle";
 import { NavLabel } from "@/components/nav-label";
 import { PageHeader } from "@/components/page-header";
 import { createClient } from "@/lib/supabase/client";
@@ -61,7 +62,7 @@ export default function SearchPage() {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search username"
-        className="mt-4 w-full rounded-xl border border-chirp-border bg-chirp-bg px-3 py-2 text-chirp-text accent-chirp-accent outline-none ring-chirp-accent focus:ring-2"
+        className="mt-4 w-full rounded-xl border border-chirp-border bg-chirp-bg px-3 py-2 font-sans text-chirp-text placeholder:font-mono placeholder:text-sm placeholder:text-chirp-muted accent-chirp-accent outline-none ring-chirp-accent focus:ring-2"
         autoComplete="off"
       />
       {loading && debounced.trim().length > 0 ? (
@@ -82,16 +83,14 @@ export default function SearchPage() {
               <span className="font-semibold text-chirp-text">
                 {p.display_name?.trim() || p.handle}
               </span>
-              <span className="ml-2 font-mono text-sm text-chirp-accent">
-                @{p.handle}
-              </span>
+              <AtHandle handle={p.handle} className="ml-2 text-sm" />
             </Link>
           </li>
         ))}
       </ul>
       {debounced.trim().length < 1 ? (
         <p className="mt-6 text-sm text-chirp-muted">
-          Find people by @handle
+          Find people by <AtHandle handle="handle" className="text-sm" />
         </p>
       ) : null}
       </div>
