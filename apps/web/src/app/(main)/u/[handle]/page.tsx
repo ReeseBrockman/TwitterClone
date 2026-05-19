@@ -90,6 +90,7 @@ export default async function ProfilePage({ params }: PageProps) {
         handle={profile.handle}
         displayName={profile.display_name}
         bio={profile.bio}
+        avatarUrl={profile.avatar_url}
         targetId={profile.id}
         postCount={postCount ?? 0}
         followerCount={followerCount ?? 0}

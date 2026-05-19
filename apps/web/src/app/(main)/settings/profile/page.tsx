@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BIO_MAX, DISPLAY_NAME_MAX } from "@chirp/shared";
@@ -88,20 +87,7 @@ export default function EditProfilePage() {
   }
 
   return (
-    <>
-      <header className="border-b border-chirp-border bg-chirp-bg/60 px-5 py-4 backdrop-blur-sm">
-        <Link
-          href="/settings"
-          className="text-sm text-chirp-muted hover:text-chirp-accent"
-        >
-          ← Settings
-        </Link>
-        <h1 className="mt-2 text-xl font-bold tracking-tight text-chirp-text">
-          Edit profile
-        </h1>
-        <p className="mt-1 text-sm text-chirp-muted">Display name and bio</p>
-      </header>
-      <form className="max-w-md space-y-4 px-5 py-6" onSubmit={(e) => void save(e)}>
+    <form className="max-w-md space-y-4 px-5 py-6" onSubmit={(e) => void save(e)}>
         <label className="block text-sm font-medium text-chirp-muted">
           Display name
           <input
@@ -141,7 +127,6 @@ export default function EditProfilePage() {
         >
           {saving ? "Saving…" : "Save changes"}
         </button>
-      </form>
-    </>
+    </form>
   );
 }

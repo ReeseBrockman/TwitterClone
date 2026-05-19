@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Avatar } from "@/components/avatar";
+import { avatarPublicUrl } from "@/lib/avatar-url";
 import { FollowButton } from "@/components/follow-button";
 
 type Props = {
   handle: string;
   displayName: string | null;
   bio: string | null;
+  avatarUrl: string | null;
   targetId: string;
   postCount: number;
   followerCount: number;
@@ -29,6 +31,7 @@ export function ProfileHeader({
   handle,
   displayName,
   bio,
+  avatarUrl,
   targetId,
   postCount,
   followerCount,
@@ -41,7 +44,12 @@ export function ProfileHeader({
   return (
     <header className="border-b border-chirp-border px-4 py-5 md:px-6 md:py-6">
       <div className="flex gap-5 md:gap-8">
-        <Avatar displayName={name} handle={handle} size="lg" />
+        <Avatar
+          displayName={name}
+          handle={handle}
+          avatarUrl={avatarPublicUrl(avatarUrl)}
+          size="lg"
+        />
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 md:gap-3">

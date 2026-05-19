@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Avatar } from "@/components/avatar";
+import { avatarPublicUrl } from "@/lib/avatar-url";
 import { LikeButton } from "@/components/like-button";
 import { PostFeedMedia } from "@/components/post-feed-media";
 
@@ -51,7 +52,11 @@ export function PostCard({ post, likeCount, likedByMe }: Props) {
     <article className="border-b border-chirp-border px-5 py-4 transition-colors hover:bg-white/[0.02]">
       <div className="flex gap-3">
         <Link href={`/u/${handle}`} className="shrink-0">
-          <Avatar displayName={name} handle={handle} />
+          <Avatar
+            displayName={name}
+            handle={handle}
+            avatarUrl={avatarPublicUrl(profile?.avatar_url)}
+          />
         </Link>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">

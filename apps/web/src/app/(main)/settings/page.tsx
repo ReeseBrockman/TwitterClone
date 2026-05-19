@@ -50,7 +50,7 @@ export default async function SettingsPage() {
         <SettingsRow
           href="/settings/profile"
           title="Edit profile"
-          description="Display name and bio"
+          description="Display name, bio, and profile photo"
         />
       </nav>
     </>
