@@ -20,11 +20,30 @@ export default async function FollowingPage() {
   const followingIds = (follows ?? []).map((f) => f.following_id);
   const feedAuthorIds = [...new Set([...followingIds, user.id])];
 
-  const { rows, likeCount, likedByMe } = await loadFeedForAuthors(
-    supabase,
-    feedAuthorIds,
-    user.id,
-  );
+  let rows;
+  let likeCount;
+  let likedByMe;
+  try {
+    ({ rows, likeCount, likedByMe } = await loadFeedForAuthors(
+      supabase,
+      feedAuthorIds,
+      user.id,
+    ));
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Could not load your feed.";
+    return (
+      <>
+        <PageHeader
+          title={<FeedTitle />}
+          description="Posts from people you follow"
+        />
+        <p className="px-5 py-8 text-sm text-red-400" role="alert">
+          {message}
+        </p>
+      </>
+    );
+  }
 
   return (
     <>
