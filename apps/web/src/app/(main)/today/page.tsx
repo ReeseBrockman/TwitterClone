@@ -2,8 +2,9 @@ import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { SetupRequired } from "@/components/setup-required";
 import { PostCard, type PostRow } from "@/components/post-card";
+import { enrichPostsWithMedia, fetchLikeState } from "@/lib/feed";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/auth";
 
 type LeaderRow = {
   post_id: string;
@@ -15,10 +16,7 @@ type LeaderRow = {
 
 export default async function TodayPage() {
   if (!isSupabaseConfigured()) return <SetupRequired />;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
   if (!user) return null;
 
   const { data: board, error } = await supabase.rpc("leaderboard_today_utc", {
@@ -28,7 +26,7 @@ export default async function TodayPage() {
   if (error) {
     return (
       <div className="px-4 py-8 text-sm text-red-400">
-        Could not load Today leaderboard. Apply the SQL migration in{" "}
+        Could not load Top leaderboard. Apply the SQL migration in{" "}
         <code className="font-mono">supabase/migrations</code> and ensure the
         RPC exists. ({error.message})
       </div>
@@ -43,7 +41,7 @@ export default async function TodayPage() {
     return (
       <>
         <PageHeader
-          title="Today"
+          title="Top"
           description="Top posts from the UTC day · likes + replies"
           badge="UTC"
         />
@@ -56,57 +54,38 @@ export default async function TodayPage() {
     );
   }
 
-  const [{ data: profiles }, { data: mediaRows }, { data: likes }] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, handle, display_name, avatar_url")
-        .in("id", authorIds),
-      supabase
-        .from("post_media")
-        .select("post_id, kind, storage_path, mime_type, duration_seconds")
-        .in("post_id", postIds),
-      supabase.from("likes").select("post_id, user_id").in("post_id", postIds),
-    ]);
+  const [{ data: profiles }, { likeCount, likedByMe }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, handle, display_name, avatar_url")
+      .in("id", authorIds),
+    fetchLikeState(supabase, postIds, user.id),
+  ]);
 
   const profileById = new Map(
     (profiles ?? []).map((p) => [p.id, p] as const),
   );
-  const mediaByPost = new Map<string, PostRow["post_media"]>();
-  for (const m of mediaRows ?? []) {
-    mediaByPost.set(m.post_id, [
-      {
-        kind: m.kind as "image" | "video",
-        storage_path: m.storage_path,
-        mime_type: m.mime_type,
-        duration_seconds: m.duration_seconds,
-      },
-    ]);
-  }
 
-  const likeCount = new Map<string, number>();
-  const likedByMe = new Set<string>();
-  for (const l of likes ?? []) {
-    likeCount.set(l.post_id, (likeCount.get(l.post_id) ?? 0) + 1);
-    if (l.user_id === user.id) likedByMe.add(l.post_id);
-  }
+  const basePosts: PostRow[] = rows.map((r) => ({
+    id: r.post_id,
+    content: r.content,
+    created_at: r.created_at,
+    author_id: r.author_id,
+    profiles: profileById.get(r.author_id) ?? null,
+    post_media: null,
+  }));
 
-  const cards: { post: PostRow; score: number }[] = rows.map((r) => ({
+  const posts = await enrichPostsWithMedia(supabase, basePosts);
+
+  const cards = rows.map((r, i) => ({
     score: Number(r.score),
-    post: {
-      id: r.post_id,
-      content: r.content,
-      created_at: r.created_at,
-      author_id: r.author_id,
-      profiles: profileById.get(r.author_id) ?? null,
-      post_media: mediaByPost.get(r.post_id) ?? null,
-    },
+    post: posts[i],
   }));
 
   return (
     <>
       <PageHeader
-        title="Today"
+        title="Top"
         description="Top posts from the UTC day · separate from your home feed"
         badge="UTC"
       />

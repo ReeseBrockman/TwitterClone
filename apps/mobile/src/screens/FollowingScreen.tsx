@@ -37,20 +37,13 @@ export function FollowingScreen() {
       .from("follows")
       .select("following_id")
       .eq("follower_id", user.id);
-    const ids = (follows ?? []).map((f) => f.following_id);
-    if (ids.length === 0) {
-      setRows([]);
-      setMessage(
-        "Use the Search tab to find people by username, open their profile, then tap Follow.",
-      );
-      setLoading(false);
-      return;
-    }
+    const followingIds = (follows ?? []).map((f) => f.following_id);
+    const feedAuthorIds = [...new Set([...followingIds, user.id])];
     const { data: posts } = await supabase
       .from("posts")
       .select("id, content, created_at, author_id")
       .is("parent_id", null)
-      .in("author_id", ids)
+      .in("author_id", feedAuthorIds)
       .order("created_at", { ascending: false })
       .limit(50);
     const list = posts ?? [];

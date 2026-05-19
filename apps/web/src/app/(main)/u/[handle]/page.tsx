@@ -6,17 +6,14 @@ import {
 } from "@/components/profile-post-grid";
 import { SetupRequired } from "@/components/setup-required";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/auth";
 
 type PageProps = { params: Promise<{ handle: string }> };
 
 export default async function ProfilePage({ params }: PageProps) {
   if (!isSupabaseConfigured()) return <SetupRequired />;
   const { handle } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
   if (!user) return null;
 
   const { data: profile } = await supabase

@@ -8,6 +8,10 @@ import { PageHeader } from "@/components/page-header";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import {
+  readImageDimensions,
+  readVideoMetadata,
+} from "@/lib/media-dimensions";
 
 function extFromMime(mime: string) {
   if (mime === "image/jpeg") return "jpg";
@@ -17,23 +21,6 @@ function extFromMime(mime: string) {
   if (mime === "video/mp4") return "mp4";
   if (mime === "video/quicktime") return "mov";
   return "bin";
-}
-
-function readVideoDuration(file: File): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const v = document.createElement("video");
-    v.preload = "metadata";
-    v.onloadedmetadata = () => {
-      URL.revokeObjectURL(url);
-      resolve(Number.isFinite(v.duration) ? v.duration : 0);
-    };
-    v.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Could not read video metadata"));
-    };
-    v.src = url;
-  });
 }
 
 export default function ComposePage() {
@@ -71,6 +58,8 @@ export default function ComposePage() {
 
       let kind: "image" | "video" | null = null;
       let durationSeconds: number | null = null;
+      let mediaWidth: number | null = null;
+      let mediaHeight: number | null = null;
       if (file) {
         if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
           setError("Only image or video files are supported.");
@@ -79,13 +68,19 @@ export default function ComposePage() {
         }
         kind = file.type.startsWith("video/") ? "video" : "image";
         if (kind === "video") {
-          const dur = await readVideoDuration(file);
-          if (dur > POST_MAX_VIDEO_SECONDS + 0.25) {
+          const meta = await readVideoMetadata(file);
+          if (meta.durationSeconds > POST_MAX_VIDEO_SECONDS + 0.25) {
             setError(`Video must be ${POST_MAX_VIDEO_SECONDS} seconds or shorter.`);
             setBusy(false);
             return;
           }
-          durationSeconds = dur;
+          durationSeconds = meta.durationSeconds;
+          mediaWidth = meta.width;
+          mediaHeight = meta.height;
+        } else {
+          const dims = await readImageDimensions(file);
+          mediaWidth = dims.width;
+          mediaHeight = dims.height;
         }
       }
 
@@ -124,6 +119,8 @@ export default function ComposePage() {
           kind,
           storage_path: path,
           mime_type: file.type,
+          width: mediaWidth,
+          height: mediaHeight,
           duration_seconds: kind === "video" ? durationSeconds : null,
         });
         if (mediaErr) {

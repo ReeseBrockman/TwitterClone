@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Avatar } from "@/components/avatar";
 import { PageHeader } from "@/components/page-header";
 import { SetupRequired } from "@/components/setup-required";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -31,7 +30,7 @@ function SettingsRow({
   );
 }
 
-export default async function ProfilePage() {
+export default async function SettingsPage() {
   if (!isSupabaseConfigured()) return <SetupRequired />;
   const supabase = await createClient();
   const {
@@ -39,46 +38,19 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("handle, display_name, bio")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (!profile) redirect("/login");
-
-  const name = profile.display_name?.trim() || profile.handle;
-
   return (
     <>
-      <PageHeader title="Profile" description="Your account and public profile" />
-      <div className="flex items-start gap-4 border-b border-chirp-border px-5 py-6">
-        <Avatar displayName={name} handle={profile.handle} />
-        <div className="min-w-0">
-          <p className="text-lg font-semibold text-chirp-text">{name}</p>
-          <p className="text-chirp-accent">@{profile.handle}</p>
-          {profile.bio?.trim() ? (
-            <p className="mt-2 text-sm leading-relaxed text-chirp-muted">
-              {profile.bio}
-            </p>
-          ) : (
-            <p className="mt-2 text-sm text-chirp-muted">No bio yet.</p>
-          )}
-          {user.email ? (
-            <p className="mt-3 text-xs text-chirp-muted">{user.email}</p>
-          ) : null}
-        </div>
-      </div>
-      <nav aria-label="Profile settings">
+      <PageHeader title="Settings" />
+      <nav aria-label="Settings">
         <SettingsRow
           href="/settings/account"
           title="Account settings"
-          description="Username, display name, and bio"
+          description="Username and email"
         />
         <SettingsRow
-          href={`/u/${profile.handle}`}
-          title="View public profile"
-          description="See how others see you"
+          href="/settings/profile"
+          title="Edit profile"
+          description="Display name and bio"
         />
       </nav>
     </>

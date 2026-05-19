@@ -45,6 +45,7 @@ export async function updateSession(request: NextRequest) {
     path === "/today" ||
     path === "/search" ||
     path === "/compose" ||
+    path === "/profile" ||
     path.startsWith("/settings") ||
     path.startsWith("/u/");
 

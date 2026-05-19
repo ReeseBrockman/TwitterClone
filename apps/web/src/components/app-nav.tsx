@@ -2,25 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FeedTitle } from "@/components/feed-title";
 
-function navItems(profileHref: string) {
-  return [
-    { href: "/following", label: "Home", icon: HomeIcon },
-    { href: "/search", label: "Search", icon: SearchIcon },
-    { href: "/today", label: "Today", icon: TodayIcon },
-    { href: profileHref, label: "Profile", icon: ProfileIcon },
-  ] as const;
-}
+const navItems = [
+  { href: "/following", label: "feed", icon: HomeIcon, title: <FeedTitle /> },
+  { href: "/search", label: "Search", icon: SearchIcon, title: "Search" },
+  { href: "/today", label: "Top", icon: TopIcon, title: "Top" },
+  { href: "/profile", label: "Profile", icon: ProfileIcon, title: "Profile" },
+] as const;
 
 function NavLink({
   href,
   label,
+  title,
   icon: Icon,
   active,
   compact,
 }: {
   href: string;
   label: string;
+  title: React.ReactNode;
   icon: () => React.ReactNode;
   active: boolean;
   compact?: boolean;
@@ -41,17 +42,23 @@ function NavLink({
     >
       <Icon />
       {!compact ? (
-        <span className="text-sm font-medium">{label}</span>
+        <span className="text-sm font-medium">{title}</span>
       ) : null}
     </Link>
   );
 }
 
-export function AppNav({ profileHref }: { profileHref: string }) {
+export function AppNav({ profileHandle }: { profileHandle: string | null }) {
   const pathname = usePathname() ?? "/";
-  const items = navItems(profileHref);
-  const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (href: string) => {
+    if (href === "/profile") {
+      return (
+        pathname === "/profile" ||
+        (profileHandle !== null && pathname === `/u/${profileHandle}`)
+      );
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
     <>
@@ -65,7 +72,7 @@ export function AppNav({ profileHref }: { profileHref: string }) {
         </Link>
 
         <nav className="flex flex-1 flex-col gap-1">
-          {items.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.label}
               {...item}
@@ -93,7 +100,7 @@ export function AppNav({ profileHref }: { profileHref: string }) {
 
       {/* Mobile bottom bar */}
       <nav className="fixed inset-x-0 bottom-0 z-40 flex max-w-[100vw] items-center justify-around border-t border-chirp-border bg-chirp-surface/95 px-1 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden">
-        {items.map((item) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.label}
             {...item}
@@ -135,16 +142,16 @@ function SearchIcon() {
   );
 }
 
-function TodayIcon() {
+function TopIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
-        d="M6 4h12v16H6V4Z"
+        d="M12 19V5M5 12l7-7 7 7"
         stroke="currentColor"
         strokeWidth="1.75"
+        strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d="M9 2v4M15 2v4M6 9h12" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
     </svg>
   );
 }

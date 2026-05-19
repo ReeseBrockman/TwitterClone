@@ -1,16 +1,15 @@
 import { EmptyState } from "@/components/empty-state";
+import { FeedTitle } from "@/components/feed-title";
 import { PageHeader } from "@/components/page-header";
+import { PostCard } from "@/components/post-card";
 import { SetupRequired } from "@/components/setup-required";
-import { PostCard, type PostRow } from "@/components/post-card";
+import { loadFeedForAuthors } from "@/lib/feed";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/auth";
 
 export default async function FollowingPage() {
   if (!isSupabaseConfigured()) return <SetupRequired />;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthUser();
   if (!user) return null;
 
   const { data: follows } = await supabase
@@ -19,85 +18,28 @@ export default async function FollowingPage() {
     .eq("follower_id", user.id);
 
   const followingIds = (follows ?? []).map((f) => f.following_id);
-  if (followingIds.length === 0) {
-    return (
-      <>
-        <PageHeader
-          title="Home"
-          description="Chronological posts from people you follow"
-        />
-        <EmptyState
-          title="Nothing here yet"
-          description="Search for people, follow them, and their posts show up here — newest first."
-          action={{ href: "/search", label: "Find people" }}
-        />
-      </>
-    );
-  }
+  const feedAuthorIds = [...new Set([...followingIds, user.id])];
 
-  const { data: postsRaw } = await supabase
-    .from("posts")
-    .select("id, content, created_at, author_id")
-    .is("parent_id", null)
-    .in("author_id", followingIds)
-    .order("created_at", { ascending: false })
-    .limit(50);
-
-  const posts = postsRaw ?? [];
-  const authorIds = [...new Set(posts.map((p) => p.author_id))];
-  const postIds = posts.map((p) => p.id);
-
-  const [{ data: profiles }, { data: mediaRows }, { data: likes }] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, handle, display_name, avatar_url")
-        .in("id", authorIds),
-      supabase
-        .from("post_media")
-        .select("post_id, kind, storage_path, mime_type, duration_seconds")
-        .in("post_id", postIds),
-      supabase.from("likes").select("post_id, user_id").in("post_id", postIds),
-    ]);
-
-  const profileById = new Map(
-    (profiles ?? []).map((p) => [p.id, p] as const),
+  const { rows, likeCount, likedByMe } = await loadFeedForAuthors(
+    supabase,
+    feedAuthorIds,
+    user.id,
   );
-  const mediaByPost = new Map<string, PostRow["post_media"]>();
-  for (const m of mediaRows ?? []) {
-    mediaByPost.set(m.post_id, [
-      {
-        kind: m.kind as "image" | "video",
-        storage_path: m.storage_path,
-        mime_type: m.mime_type,
-        duration_seconds: m.duration_seconds,
-      },
-    ]);
-  }
-
-  const likeCount = new Map<string, number>();
-  const likedByMe = new Set<string>();
-  for (const l of likes ?? []) {
-    likeCount.set(l.post_id, (likeCount.get(l.post_id) ?? 0) + 1);
-    if (l.user_id === user.id) likedByMe.add(l.post_id);
-  }
-
-  const rows: PostRow[] = posts.map((p) => ({
-    ...p,
-    profiles: profileById.get(p.author_id) ?? null,
-    post_media: mediaByPost.get(p.id) ?? null,
-  }));
 
   return (
     <>
       <PageHeader
-        title="Home"
-        description="Chronological posts from people you follow"
+        title={<FeedTitle />}
+        description="Posts from people you follow"
       />
       {rows.length === 0 ? (
         <EmptyState
           title="No posts yet"
-          description="People you follow haven't posted. Check back later or write something."
+          description={
+            followingIds.length === 0
+              ? "Follow people to see their posts here, or write your first post."
+              : "People you follow haven't posted. Check back later or write something."
+          }
           action={{ href: "/compose", label: "Write a post" }}
         />
       ) : (

@@ -51,7 +51,7 @@ export function ProfileHeader({
             <div className="flex flex-1 flex-wrap items-center justify-end gap-2 min-[420px]:justify-start">
               {isSelf ? (
                 <Link
-                  href="/settings/account"
+                  href="/settings"
                   className="rounded-lg border border-chirp-border px-4 py-1.5 text-sm font-semibold text-chirp-text transition-colors hover:bg-white/5"
                 >
                   Edit profile

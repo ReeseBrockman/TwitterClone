@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Avatar } from "@/components/avatar";
 import { LikeButton } from "@/components/like-button";
-import { publicMediaUrl } from "@/lib/media-url";
+import { PostFeedMedia } from "@/components/post-feed-media";
 
 export type PostRow = {
   id: string;
@@ -18,6 +18,8 @@ export type PostRow = {
         kind: "image" | "video";
         storage_path: string;
         mime_type: string;
+        width: number | null;
+        height: number | null;
         duration_seconds: number | null;
       }[]
     | null;
@@ -70,21 +72,7 @@ export function PostCard({ post, likeCount, likedByMe }: Props) {
           <p className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-chirp-text">
             {post.content}
           </p>
-          {media?.kind === "image" ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={publicMediaUrl(media.storage_path)}
-              alt=""
-              className="mt-3 max-h-80 w-full rounded-xl border border-chirp-border object-cover"
-            />
-          ) : null}
-          {media?.kind === "video" ? (
-            <video
-              src={publicMediaUrl(media.storage_path)}
-              controls
-              className="mt-3 max-h-80 w-full rounded-xl border border-chirp-border"
-            />
-          ) : null}
+          {media ? <PostFeedMedia media={media} /> : null}
           <div className="mt-3">
             <LikeButton
               postId={post.id}
