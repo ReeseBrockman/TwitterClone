@@ -34,10 +34,7 @@ export default async function FollowingPage() {
       err instanceof Error ? err.message : "Could not load your feed.";
     return (
       <>
-        <PageHeader
-          title={<FeedTitle />}
-          description="Posts from people you follow"
-        />
+        <PageHeader title={<FeedTitle />} />
         <p className="px-5 py-8 text-sm text-red-400" role="alert">
           {message}
         </p>
@@ -47,10 +44,7 @@ export default async function FollowingPage() {
 
   return (
     <>
-      <PageHeader
-        title={<FeedTitle />}
-        description="Posts from people you follow"
-      />
+      <PageHeader title={<FeedTitle />} />
       {rows.length === 0 ? (
         <EmptyState
           title="No posts yet"

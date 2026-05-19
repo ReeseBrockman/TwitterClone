@@ -1,7 +1,5 @@
+import { NavLabel } from "@/components/nav-label";
+
 export function FeedTitle({ className = "" }: { className?: string }) {
-  return (
-    <span className={className}>
-      feed<span className="text-chirp-accent">.</span>
-    </span>
-  );
+  return <NavLabel word="feed" className={className} />;
 }

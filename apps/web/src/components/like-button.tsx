@@ -50,10 +50,18 @@ export function LikeButton({ postId, initialLiked, initialCount }: Props) {
       type="button"
       onClick={() => void toggle()}
       disabled={busy}
-      className="inline-flex items-center gap-1 rounded-full border border-chirp-border px-2 py-1 text-xs text-chirp-muted hover:border-chirp-accent hover:text-chirp-accent disabled:opacity-50"
+      className={
+        liked
+          ? "inline-flex items-center gap-1 rounded-full border border-chirp-accent bg-chirp-accent/10 px-2 py-1 text-xs text-chirp-accent disabled:opacity-50"
+          : "inline-flex items-center gap-1 rounded-full border border-chirp-border px-2 py-1 text-xs text-chirp-muted hover:border-chirp-accent hover:text-chirp-accent disabled:opacity-50"
+      }
     >
-      <span aria-hidden>{liked ? "♥" : "♡"}</span>
-      <span>{count}</span>
+      <span aria-hidden className={liked ? "text-chirp-accent" : undefined}>
+        {liked ? "♥" : "♡"}
+      </span>
+      <span className={liked ? "font-medium text-chirp-accent" : undefined}>
+        {count}
+      </span>
     </button>
   );
 }

@@ -3,12 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FeedTitle } from "@/components/feed-title";
+import { NavLabel } from "@/components/nav-label";
 
 const navItems = [
   { href: "/following", label: "feed", icon: HomeIcon, title: <FeedTitle /> },
-  { href: "/search", label: "Search", icon: SearchIcon, title: "Search" },
-  { href: "/today", label: "Top", icon: TopIcon, title: "Top" },
-  { href: "/profile", label: "Profile", icon: ProfileIcon, title: "Profile" },
+  {
+    href: "/search",
+    label: "search",
+    icon: SearchIcon,
+    title: <NavLabel word="search" />,
+  },
+  { href: "/today", label: "top", icon: TopIcon, title: <NavLabel word="top" /> },
+  {
+    href: "/profile",
+    label: "profile",
+    icon: ProfileIcon,
+    title: <NavLabel word="profile" />,
+  },
 ] as const;
 
 function NavLink({

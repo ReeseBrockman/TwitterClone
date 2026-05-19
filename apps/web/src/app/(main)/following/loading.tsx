@@ -19,10 +19,7 @@ function SkeletonPost() {
 export default function FollowingLoading() {
   return (
     <>
-      <PageHeader
-        title={<FeedTitle />}
-        description="Posts from people you follow"
-      />
+      <PageHeader title={<FeedTitle />} />
       <SkeletonPost />
       <SkeletonPost />
       <SkeletonPost />
