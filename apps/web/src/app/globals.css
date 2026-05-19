@@ -20,9 +20,16 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background: var(--chirp-bg);
   color: var(--chirp-text);
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .app-shell {

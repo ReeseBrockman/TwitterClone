@@ -14,18 +14,18 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-8 px-6 py-16 text-center">
+    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col items-center justify-center gap-6 px-4 py-8 text-center sm:gap-8 sm:px-6 sm:py-16">
       <AuthBranding />
-      <div className="flex flex-row flex-nowrap justify-center gap-3">
+      <div className="flex w-full max-w-xs flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
         <Link
           href="/login"
-          className="rounded-full bg-chirp-accent px-5 py-2.5 text-sm font-semibold text-black hover:brightness-110"
+          className="rounded-full bg-chirp-accent px-5 py-2.5 text-center text-sm font-semibold text-black hover:brightness-110"
         >
           Log in
         </Link>
         <Link
           href="/register"
-          className="rounded-full border border-chirp-accent px-5 py-2.5 text-sm font-semibold text-chirp-accent hover:bg-chirp-accent/10"
+          className="rounded-full border border-chirp-accent px-5 py-2.5 text-center text-sm font-semibold text-chirp-accent hover:bg-chirp-accent/10"
         >
           Create account
         </Link>

@@ -92,7 +92,7 @@ export function AppNav({ profileHref }: { profileHref: string }) {
       </aside>
 
       {/* Mobile bottom bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-chirp-border bg-chirp-surface/95 px-2 py-2 backdrop-blur-xl md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex max-w-[100vw] items-center justify-around border-t border-chirp-border bg-chirp-surface/95 px-1 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden">
         {items.map((item) => (
           <NavLink
             key={item.label}

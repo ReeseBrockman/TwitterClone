@@ -69,9 +69,9 @@ export function ProfilePostGrid({ posts }: { posts: ProfileGridPost[] }) {
           <p className="text-xl font-light text-chirp-text">No posts yet</p>
         </div>
       ) : (
-        <ul className="grid grid-cols-3 gap-0.5 bg-chirp-border p-0.5">
+        <ul className="grid grid-cols-3">
           {posts.map((post) => (
-            <li key={post.id} className="aspect-square bg-chirp-bg">
+            <li key={post.id} className="aspect-square overflow-hidden">
               {post.media?.kind === "image" ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
